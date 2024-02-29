@@ -88,8 +88,14 @@ function removeProperties(obj, keys) {
  *    compareObjects({a: 1, b: 2}, {a: 1, b: 2}) => true
  *    compareObjects({a: 1, b: 2}, {a: 1, b: 3}) => false
  */
-function compareObjects(/* obj1, obj2 */) {
-  throw new Error('Not implemented');
+function compareObjects(obj1, obj2) {
+  const keys1 = Object.keys(obj1);
+  let i = 0;
+  while (obj2[keys1[i]] && obj1[keys1[i]] === obj2[keys1[i]]) {
+    i += 1;
+  }
+
+  return i === keys1.length;
 }
 
 /**
@@ -103,8 +109,9 @@ function compareObjects(/* obj1, obj2 */) {
  *    isEmptyObject({}) => true
  *    isEmptyObject({a: 1}) => false
  */
-function isEmptyObject(/* obj */) {
-  throw new Error('Not implemented');
+function isEmptyObject(obj) {
+  const keys = Object.keys(obj);
+  return keys.length === 0;
 }
 
 /**
@@ -123,8 +130,9 @@ function isEmptyObject(/* obj */) {
  *    immutableObj.newProp = 'new';
  *    console.log(immutableObj) => {a: 1, b: 2}
  */
-function makeImmutable(/* obj */) {
-  throw new Error('Not implemented');
+function makeImmutable(obj) {
+  Object.freeze(obj);
+  return obj;
 }
 
 /**
@@ -137,8 +145,21 @@ function makeImmutable(/* obj */) {
  *    makeWord({ a: [0, 1], b: [2, 3], c: [4, 5] }) => 'aabbcc'
  *    makeWord({ H:[0], e: [1], l: [2, 3, 8], o: [4, 6], W:[5], r:[7], d:[9]}) => 'HelloWorld'
  */
-function makeWord(/* lettersObject */) {
-  throw new Error('Not implemented');
+function makeWord(lettersObject) {
+  const arr = [];
+  const keys = Object.keys(lettersObject);
+  keys.forEach((key) => {
+    for (let i = 0; i < lettersObject[key].length; i += 1) {
+      const currIndex = lettersObject[key][i];
+
+      while (currIndex > arr.length) {
+        arr.push('');
+      }
+      arr.splice(currIndex, 1, key);
+    }
+  });
+
+  return arr.join('');
 }
 
 /**
@@ -155,8 +176,29 @@ function makeWord(/* lettersObject */) {
  *    sellTickets([25, 25, 50]) => true
  *    sellTickets([25, 100]) => false (The seller does not have enough money to give change.)
  */
-function sellTickets(/* queue */) {
-  throw new Error('Not implemented');
+function sellTickets(queue) {
+  const cash = { 25: 0, 50: 0, 100: 0 };
+  let hasChange = true;
+
+  while (hasChange && queue.length) {
+    const currentBill = queue.shift();
+
+    switch (currentBill) {
+      case 50:
+        if (cash[25] === 0) hasChange = false;
+        break;
+      case 100:
+        if (cash[25] > 3 || (cash[25] > 0 && cash[50] > 0)) break;
+        hasChange = false;
+        break;
+      default:
+        break;
+    }
+
+    if (hasChange) cash[currentBill] += 1;
+  }
+
+  return hasChange;
 }
 
 /**
@@ -172,8 +214,12 @@ function sellTickets(/* queue */) {
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  this.width = width;
+  this.height = height;
+  this.getArea = () => {
+    return width * height;
+  };
 }
 
 /**
@@ -186,8 +232,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 /**
@@ -201,8 +247,10 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const props = JSON.parse(json);
+  const obj = Object.create(proto);
+  return Object.assign(obj, props);
 }
 
 /**
@@ -231,8 +279,28 @@ function fromJSON(/* proto, json */) {
  *      { country: 'Russia',  city: 'Saint Petersburg' }
  *    ]
  */
-function sortCitiesArray(/* arr */) {
-  throw new Error('Not implemented');
+function sortCitiesArray(arr) {
+  const dataCountry = {};
+  const res = [];
+
+  arr.forEach((item) => {
+    if (dataCountry[item.country]) {
+      dataCountry[item.country].push(item.city);
+    } else {
+      dataCountry[item.country] = [item.city];
+    }
+  });
+
+  const countries = Object.keys(dataCountry).sort();
+
+  countries.forEach((country) => {
+    const cities = dataCountry[country].sort();
+    cities.forEach((city) => {
+      res.push({ country, city });
+    });
+  });
+
+  return res;
 }
 
 /**
@@ -265,8 +333,21 @@ function sortCitiesArray(/* arr */) {
  *    "Poland" => ["Lodz"]
  *   }
  */
-function group(/* array, keySelector, valueSelector */) {
-  throw new Error('Not implemented');
+function group(array, keySelector, valueSelector) {
+  const res = new Map();
+
+  array.forEach((item) => {
+    const key = keySelector(item);
+    const value = valueSelector(item);
+
+    if (res.has(key)) {
+      res.get(key).push(value);
+    } else {
+      res.set(key, [value]);
+    }
+  });
+
+  return res;
 }
 
 /**
