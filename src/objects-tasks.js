@@ -405,32 +405,80 @@ function group(array, keySelector, valueSelector) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  selector: '',
+  lastPart: '',
+  order: ['element', 'id', 'class', 'attr', 'pseudoClass', 'pseudoElement'],
+
+  element(value) {
+    this.checkOrder('element');
+    this.validate(this.selector, value);
+    return this.create(`${this.selector}${value}`, 'element');
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    this.checkOrder('id');
+    this.validate(this.selector, '#');
+    return this.create(`${this.selector}#${value}`, 'id');
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.checkOrder('class');
+    return this.create(`${this.selector}.${value}`, 'class');
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.checkOrder('attr');
+    return this.create(`${this.selector}[${value}]`, 'attr');
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.checkOrder('pseudoClass');
+    return this.create(`${this.selector}:${value}`, 'pseudoClass');
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    this.checkOrder('pseudoElement');
+    this.validate(this.selector, '::');
+    return this.create(`${this.selector}::${value}`, 'pseudoElement');
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    return Object.create(cssSelectorBuilder).create(
+      `${selector1.stringify()} ${combinator} ${selector2.stringify()}`
+    );
+  },
+
+  stringify() {
+    return this.selector;
+  },
+
+  create(newSelector, currPart = '') {
+    const newInstance = Object.create(cssSelectorBuilder);
+    newInstance.selector = newSelector;
+    newInstance.lastPart = currPart;
+    return newInstance;
+  },
+
+  validate(currentSelector, newPart) {
+    let isСompatible = true;
+    if (currentSelector.includes('table') && newPart === 'div')
+      isСompatible = false;
+    if (currentSelector.includes(newPart)) isСompatible = false;
+    if (!isСompatible)
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+  },
+
+  checkOrder(part) {
+    const lastPartInd = this.order.indexOf(this.lastPart);
+    const partInd = this.order.indexOf(part);
+
+    if (lastPartInd > -1 && lastPartInd > partInd) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
   },
 };
 
