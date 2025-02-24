@@ -61,7 +61,7 @@ function mergeObjects(objects) {
  * @example
  *    removeProperties({a: 1, b: 2, c: 3}, ['b', 'c']) => {a: 1}
  *    removeProperties({a: 1, b: 2, c: 3}, ['d', 'e']) => {a: 1, b: 2, c: 3}
- *    removeProperties({name: 'John', age: 30, city: 'New York'}, 'age') => {name: 'John', city: 'New York'}
+ *    removeProperties({name: 'John', age: 30, city: 'New York'}, ['age']) => {name: 'John', city: 'New York'}
  *
  */
 function removeProperties(obj, keys) {
@@ -230,7 +230,7 @@ function Rectangle(width, height) {
  *
  * @example
  *    [1,2,3]   =>  '[1,2,3]'
- *    { width: 10, height : 20 } => '{"height":10,"width":20}'
+ *    { height: 10, width: 20 } => '{"height":10,"width":20}'
  */
 function getJSON(obj) {
   return JSON.stringify(obj);
