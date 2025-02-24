@@ -177,28 +177,38 @@ function makeWord(lettersObject) {
  *    sellTickets([25, 100]) => false (The seller does not have enough money to give change.)
  */
 function sellTickets(queue) {
-  const cash = { 25: 0, 50: 0, 100: 0 };
-  let hasChange = true;
+  let cash25 = 0;
+  let cash50 = 0;
 
-  while (hasChange && queue.length) {
-    const currentBill = queue.shift();
-
-    switch (currentBill) {
-      case 50:
-        if (cash[25] === 0) hasChange = false;
-        break;
-      case 100:
-        if (cash[25] > 3 || (cash[25] > 0 && cash[50] > 0)) break;
-        hasChange = false;
-        break;
-      default:
-        break;
+  const canSell = queue.every((bill) => {
+    if (bill === 25) {
+      cash25 += 1;
+      return true;
     }
+    if (bill === 50) {
+      if (cash25 === 0) {
+        return false;
+      }
+      cash25 -= 1;
+      cash50 += 1;
+      return true;
+    }
+    if (bill === 100) {
+      if (cash50 > 0 && cash25 > 0) {
+        cash50 -= 1;
+        cash25 -= 1;
+        return true;
+      }
+      if (cash25 >= 3) {
+        cash25 -= 3;
+        return true;
+      }
+      return false;
+    }
+    return true;
+  });
 
-    if (hasChange) cash[currentBill] += 1;
-  }
-
-  return hasChange;
+  return canSell;
 }
 
 /**
